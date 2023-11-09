@@ -1,4 +1,4 @@
-import { Point, PointGraph, Rectangle, Rulers } from './model';
+import { Point, PointGraph, PointNode, Rectangle, Rulers, m_dist } from './model';
 
 export function computeRulers(rectangles: Rectangle[], includeMidPoints: boolean): Rulers {
   const verticals = new Set<number>();
@@ -155,5 +155,41 @@ export function createGraph(points: Point[]): PointGraph {
   }
 
   return graph;
+}
 
+export function AStar(start: PointNode, end: PointNode) {
+  const openSet: PointNode[] = [start];
+  const closedSet: PointNode[] = [];
+
+  while (openSet.length > 0) {
+    const current = openSet.sort((a, b) => a.f - b.f).shift()!;
+    if (current === end) {
+      return current;
+    }
+    closedSet.push(current);
+
+    for (const neighbor of current.adjacentNodes.keys()) {
+      // if neighbor is not passable or neighbor is in closedSet:
+      // continue
+      if (closedSet.indexOf(neighbor) >= 0) {
+        continue;
+      }
+
+      const gScore = current.g + current.adjacentNodes.get(neighbor)!;
+
+      // if neighbor is not in openSet or tentativeGScore < neighbor.g:
+      const neighborNotInOpen = openSet.indexOf(neighbor) < 0;
+
+      if (neighborNotInOpen || (gScore < neighbor.g)) {
+        neighbor.g = gScore;
+        neighbor.h = m_dist(neighbor.point, end.point);
+        neighbor.f = neighbor.g + neighbor.h;
+        neighbor.parent = current;
+        if (neighborNotInOpen) {
+          openSet.push(neighbor);
+        }
+      }
+    }
+  }
+  return null;
 }

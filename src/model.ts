@@ -64,6 +64,10 @@ export class PointNode {
   constructor(point: Point) {
     this.point = point;
   }
+  f = 0;
+  g = 0;
+  h = 0;
+  parent?: PointNode;
 }
 
 export function m_dist(a: Point, b: Point) {

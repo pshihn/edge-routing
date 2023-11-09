@@ -1,5 +1,5 @@
-import { Rectangle, ShapePort } from './model';
-import { computeNodes, computeRulers, createGraph } from './router';
+import { PointNode, Rectangle, ShapePort } from './model';
+import { AStar, computeNodes, computeRulers, createGraph } from './router';
 
 interface DragContext {
   x: number;
@@ -81,21 +81,21 @@ export class DemoCanvas {
 
     // draw rulers
     const rulers = computeRulers(this._rectangles, true);
-    this._ctx.save();
-    this._ctx.strokeStyle = 'rgba(0, 0, 0, 0.1)';
-    for (const v of rulers.verticals) {
-      this._ctx.beginPath();
-      this._ctx.moveTo(v, 0);
-      this._ctx.lineTo(v, this._canvas.height);
-      this._ctx.stroke();
-    }
-    for (const h of rulers.horizontals) {
-      this._ctx.beginPath();
-      this._ctx.moveTo(0, h);
-      this._ctx.lineTo(this._canvas.width, h);
-      this._ctx.stroke();
-    }
-    this._ctx.restore();
+    // this._ctx.save();
+    // this._ctx.strokeStyle = 'rgba(0, 0, 0, 0.1)';
+    // for (const v of rulers.verticals) {
+    //   this._ctx.beginPath();
+    //   this._ctx.moveTo(v, 0);
+    //   this._ctx.lineTo(v, this._canvas.height);
+    //   this._ctx.stroke();
+    // }
+    // for (const h of rulers.horizontals) {
+    //   this._ctx.beginPath();
+    //   this._ctx.moveTo(0, h);
+    //   this._ctx.lineTo(this._canvas.width, h);
+    //   this._ctx.stroke();
+    // }
+    // this._ctx.restore();
 
     // draw rectangles
     this._ctx.save();
@@ -106,10 +106,10 @@ export class DemoCanvas {
     this._ctx.restore();
 
     // draw enclosure
-    this._ctx.save();
-    this._ctx.strokeStyle = 'purple';
-    this._ctx.strokeRect(enclosingRect.x, enclosingRect.y, enclosingRect.width, enclosingRect.height);
-    this._ctx.restore();
+    // this._ctx.save();
+    // this._ctx.strokeStyle = 'purple';
+    // this._ctx.strokeRect(enclosingRect.x, enclosingRect.y, enclosingRect.width, enclosingRect.height);
+    // this._ctx.restore();
 
     // create graph
     const nodes = computeNodes(rulers, this._rectangles, enclosingRect);
@@ -117,8 +117,8 @@ export class DemoCanvas {
 
     // draw connections
     this._ctx.save();
-    this._ctx.strokeStyle = 'rgba(0, 200, 0, 1)';
-    this._ctx.lineWidth = 2;
+    this._ctx.strokeStyle = 'rgba(200, 200, 200, 1)';
+    this._ctx.lineWidth = 1;
     for (const edge of graph.edges) {
       this._ctx.beginPath();
       this._ctx.moveTo(edge.a.x, edge.a.y);
@@ -128,12 +128,72 @@ export class DemoCanvas {
 
     // Draw nodes
     this._ctx.save();
-    this._ctx.fillStyle = 'rgba(255, 0, 0, 0.5)';
+    this._ctx.fillStyle = 'rgba(255, 0, 0, 1)';
     for (const node of nodes) {
       this._ctx.beginPath();
       this._ctx.arc(node.x, node.y, 4, 0, Math.PI * 2);
       this._ctx.fill();
     }
     this._ctx.restore();
+
+    let startNode: PointNode | null = null;
+    let endNode: PointNode | null = null;
+    for (const rect of this._rectangles) {
+      if (rect.ports?.[0]) {
+        const port = rect.ports[0];
+        if (startNode) {
+          switch (port.direction) {
+            case 'left':
+              endNode = graph.get({ x: rect.x, y: rect.y + (port.position * rect.height) });
+              break;
+            case 'right':
+              endNode = graph.get({ x: rect.x2, y: rect.y + (port.position * rect.height) });
+              break;
+            case 'top':
+              endNode = graph.get({ x: rect.x + (port.position * rect.width), y: rect.y });
+              break;
+            case 'bottom':
+              endNode = graph.get({ x: rect.x + (port.position * rect.width), y: rect.y2 });
+              break;
+          }
+        } else {
+          switch (port.direction) {
+            case 'left':
+              startNode = graph.get({ x: rect.x, y: rect.y + (port.position * rect.height) });
+              break;
+            case 'right':
+              startNode = graph.get({ x: rect.x2, y: rect.y + (port.position * rect.height) });
+              break;
+            case 'top':
+              startNode = graph.get({ x: rect.x + (port.position * rect.width), y: rect.y });
+              break;
+            case 'bottom':
+              startNode = graph.get({ x: rect.x + (port.position * rect.width), y: rect.y2 });
+              break;
+          }
+        }
+        if (endNode) {
+          break;
+        }
+      }
+    }
+    if (startNode && endNode) {
+      let current = AStar(startNode, endNode);
+      if (current) {
+        // draw segment
+        this._ctx.save();
+        this._ctx.strokeStyle = 'orange';
+        this._ctx.lineWidth = 4;
+        this._ctx.beginPath();
+        this._ctx.moveTo(current.point.x, current.point.y);
+        while (current.parent) {
+          current = current.parent;
+          this._ctx.lineTo(current.point.x, current.point.y);
+        }
+        this._ctx.stroke();
+      } else {
+        console.log('no path found');
+      }
+    }
   }
 }
