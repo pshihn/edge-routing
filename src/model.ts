@@ -96,6 +96,116 @@ export function getDirection(a: Point, b: Point) {
   }
 }
 
+export function computeSegmentCount(start: Point, end: Point, startDir: Direction, endDir: Direction) {
+  if (endDir === 'E') {
+    switch (startDir) {
+      case 'E': {
+        if (start.x >= end.x) {
+          return 4;
+        }
+        if (start.y === end.y) {
+          return 0;
+        }
+        return 2;
+      }
+      case 'N':
+        if ((start.y > end.y) && (start.x < end.x)) {
+          return 1;
+        }
+        return 3;
+      case 'S':
+        if ((start.y < end.y) && (start.x < end.x)) {
+          return 1;
+        }
+        return 3;
+      case 'W':
+        if (start.y === end.y) {
+          return 4;
+        }
+        return 2;
+    }
+  } else if (endDir === 'W') {
+    switch (startDir) {
+      case 'E':
+        if (start.y === end.y) {
+          return 4;
+        }
+        return 2;
+      case 'N':
+        if ((start.y > end.y) && (start.x > end.x)) {
+          return 1;
+        }
+        return 3;
+      case 'S':
+        if ((start.y < end.y) && (start.x > end.x)) {
+          return 1;
+        }
+        return 3;
+      case 'W':
+        if (start.x <= end.x) {
+          return 4;
+        }
+        if (start.y === end.y) {
+          return 0;
+        }
+        return 2;
+    }
+  } else if (endDir === 'N') {
+    switch (startDir) {
+      case 'E':
+        if ((start.y > end.y) && (start.x < end.x)) {
+          return 1;
+        }
+        return 3;
+      case 'N':
+        if (start.y >= end.y) {
+          return 4;
+        }
+        if (start.x === end.x) {
+          return 0;
+        }
+        return 2;
+      case 'S':
+        if (start.x === end.x) {
+          return 4;
+        }
+        return 2;
+      case 'W':
+        if ((start.y > end.y) && (start.x > end.x)) {
+          return 1;
+        }
+        return 3;
+    }
+  } else if (endDir === 'S') {
+    switch (startDir) {
+      case 'E':
+        if ((start.y < end.y) && (start.x < end.x)) {
+          return 1;
+        }
+        return 3;
+      case 'N':
+        if (start.x === end.x) {
+          return 4;
+        }
+        return 2;
+      case 'S':
+        if (start.y <= end.y) {
+          return 4;
+        }
+        if (start.x === end.x) {
+          return 0;
+        }
+        return 2;
+      case 'W':
+        if ((start.y < end.y) && (start.x > end.x)) {
+          return 1;
+        }
+        return 3;
+    }
+  }
+  return 0;
+}
+
 export class PointGraph {
   private _nodes = new Map<number, Map<number, PointNode>>();
   private _edges: Line[] = [];

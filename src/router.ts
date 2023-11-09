@@ -1,4 +1,4 @@
-import { Point, PointGraph, PointNode, Rectangle, Rulers, m_dist } from './model';
+import { Direction, Point, PointGraph, PointNode, Rectangle, Rulers, computeSegmentCount, m_dist } from './model';
 
 export function computeRulers(rectangles: Rectangle[], includeMidPoints: boolean): Rulers {
   const verticals = new Set<number>();
@@ -157,9 +157,11 @@ export function createGraph(points: Point[]): PointGraph {
   return graph;
 }
 
-export function AStar(start: PointNode, end: PointNode) {
+export function AStar(start: PointNode, end: PointNode, endDirection: Direction) {
   const openSet: PointNode[] = [start];
   const closedSet: PointNode[] = [];
+
+  const bendMultiplier = m_dist(start.point, end.point);
 
   while (openSet.length > 0) {
     const current = openSet.sort((a, b) => a.f - b.f).shift()!;
@@ -176,15 +178,19 @@ export function AStar(start: PointNode, end: PointNode) {
       }
 
       const neighborVector = current.adjacentNodes.get(neighbor)!;
-      const gScore = current.g + neighborVector.length;
+      const directionChange = current.d ? (current.d !== neighborVector.direction) : false;
+      const gScore = current.g + neighborVector.length + (directionChange ? Math.pow(bendMultiplier, 2) : 0);
+      // const gScore = current.g + 1 + (directionChange ? 1 : 0);
 
       // if neighbor is not in openSet or tentativeGScore < neighbor.g:
       const neighborNotInOpen = openSet.indexOf(neighbor) < 0;
 
       if (neighborNotInOpen || (gScore < neighbor.g)) {
+        const estBendCount = computeSegmentCount(neighbor.point, end.point, neighborVector.direction, endDirection);
         neighbor.g = gScore;
-        neighbor.h = m_dist(neighbor.point, end.point);
+        neighbor.h = m_dist(neighbor.point, end.point) + (estBendCount * Math.pow(bendMultiplier, 2));
         neighbor.f = neighbor.g + neighbor.h;
+        neighbor.d = neighborVector.direction;
         neighbor.parent = current;
         if (neighborNotInOpen) {
           openSet.push(neighbor);

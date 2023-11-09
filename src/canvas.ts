@@ -1,4 +1,4 @@
-import { PointNode, Rectangle, ShapePort } from './model';
+import { Direction, PointNode, Rectangle, ShapePort } from './model';
 import { AStar, computeNodes, computeRulers, createGraph } from './router';
 
 interface DragContext {
@@ -138,6 +138,7 @@ export class DemoCanvas {
 
     let startNode: PointNode | null = null;
     let endNode: PointNode | null = null;
+    let endDirection: Direction | null = null;
     for (const rect of this._rectangles) {
       if (rect.ports?.[0]) {
         const port = rect.ports[0];
@@ -145,15 +146,19 @@ export class DemoCanvas {
           switch (port.direction) {
             case 'left':
               endNode = graph.get({ x: rect.x, y: rect.y + (port.position * rect.height) });
+              endDirection = 'E';
               break;
             case 'right':
               endNode = graph.get({ x: rect.x2, y: rect.y + (port.position * rect.height) });
+              endDirection = 'W';
               break;
             case 'top':
               endNode = graph.get({ x: rect.x + (port.position * rect.width), y: rect.y });
+              endDirection = 'S';
               break;
             case 'bottom':
               endNode = graph.get({ x: rect.x + (port.position * rect.width), y: rect.y2 });
+              endDirection = 'N';
               break;
           }
         } else {
@@ -177,13 +182,14 @@ export class DemoCanvas {
         }
       }
     }
+
     if (startNode && endNode) {
-      let current = AStar(startNode, endNode);
+      let current = AStar(startNode, endNode, endDirection || 'E');
       if (current) {
         // draw segment
         this._ctx.save();
         this._ctx.strokeStyle = 'orange';
-        this._ctx.lineWidth = 4;
+        this._ctx.lineWidth = 5;
         this._ctx.beginPath();
         this._ctx.moveTo(current.point.x, current.point.y);
         while (current.parent) {
