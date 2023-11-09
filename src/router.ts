@@ -175,7 +175,8 @@ export function AStar(start: PointNode, end: PointNode) {
         continue;
       }
 
-      const gScore = current.g + current.adjacentNodes.get(neighbor)!;
+      const neighborVector = current.adjacentNodes.get(neighbor)!;
+      const gScore = current.g + neighborVector.length;
 
       // if neighbor is not in openSet or tentativeGScore < neighbor.g:
       const neighborNotInOpen = openSet.indexOf(neighbor) < 0;

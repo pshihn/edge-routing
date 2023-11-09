@@ -58,20 +58,42 @@ export interface Rulers {
   horizontals: number[];
 }
 
+export interface NodeVector {
+  length: number;
+  direction: Direction;
+}
+
 export class PointNode {
   point: Point;
-  adjacentNodes = new Map<PointNode, number>();
+  adjacentNodes = new Map<PointNode, NodeVector>();
   constructor(point: Point) {
     this.point = point;
   }
   f = 0;
   g = 0;
   h = 0;
+  d?: Direction;
   parent?: PointNode;
 }
 
 export function m_dist(a: Point, b: Point) {
   return Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
+}
+
+export function getDirection(a: Point, b: Point) {
+  if (a.x === b.x) {
+    if (a.y < b.y) {
+      return 'S';
+    } else {
+      return 'N';
+    }
+  } else {
+    if (a.x < b.x) {
+      return 'E';
+    } else {
+      return 'W';
+    }
+  }
 }
 
 export class PointGraph {
@@ -101,8 +123,8 @@ export class PointGraph {
       throw new Error(`A point was not found`);
     }
     const d = m_dist(a, b);
-    nodeA.adjacentNodes.set(nodeB, d);
-    nodeB.adjacentNodes.set(nodeA, d);
+    nodeA.adjacentNodes.set(nodeB, { length: d, direction: getDirection(a, b) });
+    nodeB.adjacentNodes.set(nodeA, { length: d, direction: getDirection(b, a) });
     this._edges.push({ a, b });
   }
 
