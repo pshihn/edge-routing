@@ -65,11 +65,8 @@ export class DemoCanvas {
     }
   }
 
-  private _draw() {
-    this._ctx.clearRect(0, 0, this._canvas.width, this._canvas.height);
-
-    // find enclosing rectangle
-    const enclosingDims = this._rectangles.reduce((prev, curr) => {
+  private _createEnclosure(rects: Rectangle[]) {
+    const enclosingDims = rects.reduce((prev, curr) => {
       return {
         x: Math.min(prev.x, curr.x),
         y: Math.min(prev.y, curr.y),
@@ -77,10 +74,32 @@ export class DemoCanvas {
         y2: Math.max(prev.y2, curr.y2),
       };
     }, { x: Infinity, y: Infinity, x2: -Infinity, y2: -Infinity });
-    const enclosingRect = Rectangle.fromDiagonal(enclosingDims.x, enclosingDims.y, enclosingDims.x2, enclosingDims.y2).createPadded(50);
+    return Rectangle.fromDiagonal(enclosingDims.x, enclosingDims.y, enclosingDims.x2, enclosingDims.y2).createPadded(50);
+  }
+
+  private _draw() {
+    this._ctx.clearRect(0, 0, this._canvas.width, this._canvas.height);
+
+    // find enclosing rectangle
+    const connectedRects = this._rectangles.filter((rect) => rect.ports?.length);
+    let enclosingRect = this._createEnclosure(connectedRects);
+    let recomputeEnclosure = false;
+    for (const rect of this._rectangles) {
+      if (rect.ports?.length) {
+        continue;
+      }
+      if (enclosingRect.intersects(rect)) {
+        connectedRects.push(rect);
+        recomputeEnclosure = true;
+      }
+    }
+    if (recomputeEnclosure) {
+      enclosingRect = this._createEnclosure(connectedRects);
+    }
+
 
     // draw rulers
-    const rulers = computeRulers(this._rectangles, true);
+    const rulers = computeRulers(connectedRects, true);
     // this._ctx.save();
     // this._ctx.strokeStyle = 'rgba(0, 0, 0, 0.1)';
     // for (const v of rulers.verticals) {
@@ -112,7 +131,7 @@ export class DemoCanvas {
     // this._ctx.restore();
 
     // create graph
-    const nodes = computeNodes(rulers, this._rectangles, enclosingRect);
+    const nodes = computeNodes(rulers, connectedRects, enclosingRect);
     const graph = createGraph(nodes);
 
     // draw connections
@@ -139,7 +158,7 @@ export class DemoCanvas {
     let startNode: PointNode | null = null;
     let endNode: PointNode | null = null;
     let endDirection: Direction | null = null;
-    for (const rect of this._rectangles) {
+    for (const rect of connectedRects) {
       if (rect.ports?.[0]) {
         const port = rect.ports[0];
         if (startNode) {

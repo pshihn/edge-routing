@@ -51,6 +51,17 @@ export class Rectangle {
   contains(p: Point): boolean {
     return p.x >= this.x && p.x <= this.x2 && p.y >= this.y && p.y <= this.y2;
   }
+
+  intersects(other: Rectangle): boolean {
+    return rectanglesIntersect(this, other);
+  }
+}
+
+function rectanglesIntersect(rect1: Rectangle, rect2: Rectangle) {
+  return !(rect2.x > rect1.x2 ||
+    rect2.x2 < rect1.x ||
+    rect2.y > rect1.y2 ||
+    rect2.y2 < rect1.y);
 }
 
 export interface Rulers {
