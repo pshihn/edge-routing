@@ -100,21 +100,6 @@ export class DemoCanvas {
 
     // draw rulers
     const rulers = computeRulers(connectedRects, true);
-    // this._ctx.save();
-    // this._ctx.strokeStyle = 'rgba(0, 0, 0, 0.1)';
-    // for (const v of rulers.verticals) {
-    //   this._ctx.beginPath();
-    //   this._ctx.moveTo(v, 0);
-    //   this._ctx.lineTo(v, this._canvas.height);
-    //   this._ctx.stroke();
-    // }
-    // for (const h of rulers.horizontals) {
-    //   this._ctx.beginPath();
-    //   this._ctx.moveTo(0, h);
-    //   this._ctx.lineTo(this._canvas.width, h);
-    //   this._ctx.stroke();
-    // }
-    // this._ctx.restore();
 
     // draw rectangles
     this._ctx.save();
@@ -123,12 +108,6 @@ export class DemoCanvas {
       this._ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
     });
     this._ctx.restore();
-
-    // draw enclosure
-    // this._ctx.save();
-    // this._ctx.strokeStyle = 'purple';
-    // this._ctx.strokeRect(enclosingRect.x, enclosingRect.y, enclosingRect.width, enclosingRect.height);
-    // this._ctx.restore();
 
     // create graph
     const nodes = computeNodes(rulers, connectedRects, enclosingRect);
