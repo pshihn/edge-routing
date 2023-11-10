@@ -125,14 +125,14 @@ export class DemoCanvas {
     }
 
     // Draw nodes
-    this._ctx.save();
-    this._ctx.fillStyle = 'rgba(255, 0, 0, 1)';
-    for (const node of nodes) {
-      this._ctx.beginPath();
-      this._ctx.arc(node.x, node.y, 4, 0, Math.PI * 2);
-      this._ctx.fill();
-    }
-    this._ctx.restore();
+    // this._ctx.save();
+    // this._ctx.fillStyle = 'rgba(255, 0, 0, 1)';
+    // for (const node of nodes) {
+    //   this._ctx.beginPath();
+    //   this._ctx.arc(node.x, node.y, 4, 0, Math.PI * 2);
+    //   this._ctx.fill();
+    // }
+    // this._ctx.restore();
 
     let startNode: PointNode | null = null;
     let endNode: PointNode | null = null;
