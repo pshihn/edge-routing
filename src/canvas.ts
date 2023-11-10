@@ -1,5 +1,5 @@
 import { Direction, PointNode, Rectangle, ShapePort } from './model';
-import { AStar, computeNodes, computeRulers, createGraph } from './router';
+import { AStar, computeNodes, computeRulers, createGraph } from './router-old';
 
 interface DragContext {
   x: number;
