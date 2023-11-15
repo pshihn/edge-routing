@@ -369,8 +369,9 @@ export function route(connection: Connection, rectangles: Rectangle[], options: 
   const graph = createGraph(points);
   const startNode = graph.get(connectionStart);
   const endNode = graph.get(connectionEnd);
+  let pathPointer: Node | null = null;
   if (startNode && endNode) {
-    return AStar(startNode, endNode, connection.to.direction);
+    pathPointer = AStar(startNode, endNode, connection.to.direction);
   }
-  return null;
+  return { graph, pathPointer };
 }

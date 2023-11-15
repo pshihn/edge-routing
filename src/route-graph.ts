@@ -100,6 +100,7 @@ export class Rectangle {
   y: number;
   width: number;
   height: number;
+  color?: string;
 
   static fromDiagonal(x1: number, y1: number, x2: number, y2: number): Rectangle {
     return new Rectangle(x1, y1, x2 - x1, y2 - y1);
@@ -109,11 +110,12 @@ export class Rectangle {
     return Rectangle.fromDiagonal(this.x - padding, this.y - padding, this.x2 + padding, this.y2 + padding);
   }
 
-  constructor(x: number, y: number, width: number, height: number) {
+  constructor(x: number, y: number, width: number, height: number, color?: string) {
     this.x = x;
     this.y = y;
     this.width = Math.abs(width);
     this.height = Math.abs(height);
+    this.color = color;
   }
 
   get x2() {
