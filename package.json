@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "rm -rf bin && tsc",
+    "build": "rm -rf bin && tsc && node build.js",
     "serve": "web-dev-server --config dev-server.config.mjs"
   },
   "repository": {
@@ -20,5 +20,10 @@
   "devDependencies": {
     "@web/dev-server": "^0.4.0",
     "typescript": "^5.2.2"
+  },
+  "dependencies": {
+    "@hivepoint/navu-common-ui": "^3.1.7",
+    "esbuild": "^0.19.5",
+    "lit": "^2.8.0"
   }
 }
