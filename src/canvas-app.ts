@@ -3,13 +3,13 @@ import { Connection, Direction, Rectangle } from './route-graph';
 import { NvSelect } from '@hivepoint/navu-common-ui/lib/components/select.js';
 import { NvCheckbox } from '@hivepoint/navu-common-ui/lib/components/checkbox.js';
 import { NvSlider } from '@hivepoint/navu-common-ui/lib/components/slider.js';
+import { route } from './router';
 
 import '@hivepoint/navu-common-ui/lib/components/select.js';
 import '@hivepoint/navu-common-ui/lib/components/checkbox.js';
 import '@hivepoint/navu-common-ui/lib/components/button.js';
 import '@hivepoint/navu-common-ui/lib/components/slider.js';
 
-import { route } from './router';
 
 interface DragContext {
   x: number;
@@ -263,10 +263,12 @@ export class CanvasApp extends Component {
       ctx.strokeStyle = 'red';
       ctx.lineWidth = 5;
       ctx.beginPath();
-      ctx.moveTo(current.point.x, current.point.y);
+      let cp = current.point.shadow || current.point;
+      ctx.moveTo(cp.x, cp.y);
       while (current.parent) {
         current = current.parent;
-        ctx.lineTo(current.point.x, current.point.y);
+        cp = current.point.shadow || current.point;
+        ctx.lineTo(cp.x, cp.y);
       }
       ctx.stroke();
     }

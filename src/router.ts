@@ -1,4 +1,4 @@
-import { Rectangle, Connection, NodePoint, PointGraph, Node, Direction, m_dist } from './route-graph.js';
+import { Rectangle, Connection, NodePoint, PointGraph, Node, Direction, m_dist, ConnectionPort } from './route-graph.js';
 
 interface Rulers {
   verticals: number[];
@@ -88,23 +88,14 @@ function computeNodePoints(rulers: Rulers, rectangles: Rectangle[], connection: 
 
   [connection.from, connection.to].forEach((port, i) => {
     const rect = port.rectangle;
-    const position = Math.max(0, Math.min(1, port.position));
-    let point: NodePoint | null;
-    switch (port.direction) {
-      case 'E':
-        point = { x: rect.x, y: rect.y + (position * rect.height) };
-        break;
-      case 'W':
-        point = { x: rect.x2, y: rect.y + (position * rect.height) };
-        break;
-      case 'S':
-        point = { x: rect.x + (position * rect.width), y: rect.y };
-        break;
-      case 'N':
-        point = { x: rect.x + (position * rect.width), y: rect.y2 };
-        break;
-    }
+    let point = getPortPoint(rect, port);
     if (point) {
+      if (rect.original) {
+        const shadowPoint = getPortPoint(rect.original, port);
+        if (shadowPoint) {
+          point.shadow = shadowPoint;
+        }
+      }
       addNode(point);
       if (i === 0) {
         start = point;
@@ -119,6 +110,26 @@ function computeNodePoints(rulers: Rulers, rectangles: Rectangle[], connection: 
     connectionStart: start!,
     connectionEnd: end!,
   }
+}
+
+function getPortPoint(rect: Rectangle, port: ConnectionPort) {
+  const position = Math.max(0, Math.min(1, port.position));
+  let point: NodePoint | null;
+  switch (port.direction) {
+    case 'E':
+      point = { x: rect.x, y: rect.y + (position * rect.height) };
+      break;
+    case 'W':
+      point = { x: rect.x2, y: rect.y + (position * rect.height) };
+      break;
+    case 'S':
+      point = { x: rect.x + (position * rect.width), y: rect.y };
+      break;
+    case 'N':
+      point = { x: rect.x + (position * rect.width), y: rect.y2 };
+      break;
+  }
+  return point;
 }
 
 function createGraph(points: NodePoint[]): PointGraph {
