@@ -341,12 +341,20 @@ function createEnclosure(rects: Rectangle[], padding: number) {
 
 export interface RouteOptions {
   enclosurePadding: number;
+  shapePadding: number;
   avoidOtherShapes: boolean;
 }
 
 export function route(connection: Connection, rectangles: Rectangle[], options: RouteOptions) {
-  const otherRects = rectangles.filter((rect) => (rect !== connection.from.rectangle) && (rect !== connection.to.rectangle));
-  const connectedRects = [connection.from.rectangle, connection.to.rectangle];
+  let otherRects = rectangles.filter((rect) => (rect !== connection.from.rectangle) && (rect !== connection.to.rectangle));
+  let connectedRects = [connection.from.rectangle, connection.to.rectangle];
+  if (options.shapePadding > 0) {
+    otherRects = otherRects.map((rect) => rect.createPadded(options.shapePadding));
+    connectedRects = connectedRects.map((rect) => rect.createPadded(options.shapePadding));
+    connection.from.rectangle = connectedRects[0];
+    connection.to.rectangle = connectedRects[1];
+  }
+
 
   // compute enclosure
   let enclosingRect = createEnclosure(connectedRects, options.enclosurePadding);

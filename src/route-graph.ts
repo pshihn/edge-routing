@@ -101,13 +101,16 @@ export class Rectangle {
   width: number;
   height: number;
   color?: string;
+  original?: Rectangle;
 
   static fromDiagonal(x1: number, y1: number, x2: number, y2: number): Rectangle {
     return new Rectangle(x1, y1, x2 - x1, y2 - y1);
   }
 
   createPadded(padding: number) {
-    return Rectangle.fromDiagonal(this.x - padding, this.y - padding, this.x2 + padding, this.y2 + padding);
+    const rect = Rectangle.fromDiagonal(this.x - padding, this.y - padding, this.x2 + padding, this.y2 + padding);
+    rect.original = this;
+    return rect;
   }
 
   constructor(x: number, y: number, width: number, height: number, color?: string) {

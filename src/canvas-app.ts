@@ -27,7 +27,7 @@ export class CanvasApp extends Component {
   @query('#startOffsetSlider') private startOffsetSlider!: NvSlider;
   @query('#endOffsetSlider') private endOffsetSlider!: NvSlider;
 
-  @state() private _enclosurePadding = 50;
+  @state() private _enclosurePadding = 10;
   @state() private _startOffset = 50;
   @state() private _endOffset = 50;
 
@@ -111,9 +111,9 @@ export class CanvasApp extends Component {
         <nv-checkbox id="chkAvoid" label="Avoid shape collisions"></nv-checkbox>
       </div>
       <div style="margin-top: 8px;">
-        <label>Graph Padding: <span>${this._enclosurePadding}</span></label>
+        <label>Shape Padding: <span>${this._enclosurePadding}</span></label>
         <div>
-          <nv-slider id="paddingSlider" min="0" max="100" step="1" value="50" @input="${this._onSettingsChange}"></nv-slider>
+          <nv-slider id="paddingSlider" min="0" max="100" step="1" value="10" @input="${this._onSettingsChange}"></nv-slider>
         </div>
       </div>
       <div style="margin-top: 8px;">
@@ -230,7 +230,8 @@ export class CanvasApp extends Component {
 
     const { graph, pathPointer } = route(connection, this._rectangles, {
       avoidOtherShapes: this._avoidCollisions,
-      enclosurePadding: this._enclosurePadding
+      enclosurePadding: this._enclosurePadding * 2,
+      shapePadding: this._enclosurePadding
     });
 
     if (this._drawGraph) {
