@@ -53,10 +53,10 @@ export class CanvasApp extends Component {
     }
     #overlay {
       position: absolute;
-      gap: 12px;
+      gap: 4px;
       top: 0;
       right: 0;
-      padding: 16px 24px;
+      padding: 8px 24px;
       box-shadow: 0 3px 3px -2px rgba(0,0,0,.2), 0 3px 4px 0 rgba(0,0,0,.14), 0 1px 8px 0 rgba(0,0,0,.12);
       background: #fafafa;
       border-radius: 4px;
@@ -67,7 +67,6 @@ export class CanvasApp extends Component {
     label {
       color: #666;
       letter-spacing: 0.5px;
-      margin-bottom: 8px;
       display: block;
     }
     nv-checkbox {
