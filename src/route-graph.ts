@@ -53,9 +53,14 @@ function getDirection(a: NodePoint, b: NodePoint) {
 export class PointGraph {
   private _nodes = new Map<number, Map<number, Node>>();
   private _edges: Line[] = [];
+  private _nodeList: Node[] = [];
 
   get edges(): Line[] {
     return this._edges;
+  }
+
+  get nodes(): Node[] {
+    return this._nodeList;
   }
 
   addNode(p: NodePoint) {
@@ -65,7 +70,9 @@ export class PointGraph {
     }
     const ys = this._nodes.get(x)!;
     if (!ys.has(y)) {
-      ys.set(y, new Node(p));
+      const node = new Node(p);
+      ys.set(y, node);
+      this._nodeList.push(node);
     }
   }
 

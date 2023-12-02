@@ -24,10 +24,12 @@ export class CanvasApp extends Component {
   @query('#chkShowGraph') private chkShowGraph!: NvCheckbox;
   @query('#chkAvoid') private chkAvoid!: NvCheckbox;
   @query('#paddingSlider') private paddingSlider!: NvSlider;
+  @query('#shapePaddingSlider') private shapePaddingSlider!: NvSlider;
   @query('#startOffsetSlider') private startOffsetSlider!: NvSlider;
   @query('#endOffsetSlider') private endOffsetSlider!: NvSlider;
 
-  @state() private _enclosurePadding = 10;
+  @state() private _enclosurePadding = 20;
+  @state() private _shapePadding = 10;
   @state() private _startOffset = 50;
   @state() private _endOffset = 50;
 
@@ -111,9 +113,15 @@ export class CanvasApp extends Component {
         <nv-checkbox id="chkAvoid" label="Avoid shape collisions"></nv-checkbox>
       </div>
       <div style="margin-top: 8px;">
-        <label>Shape Padding: <span>${this._enclosurePadding}</span></label>
+        <label>Enclosure Padding: <span>${this._enclosurePadding}</span></label>
         <div>
-          <nv-slider id="paddingSlider" min="0" max="100" step="1" value="10" @input="${this._onSettingsChange}"></nv-slider>
+          <nv-slider id="paddingSlider" min="0" max="100" step="1" value="20" @input="${this._onSettingsChange}"></nv-slider>
+        </div>
+      </div>
+      <div style="margin-top: 8px;">
+        <label>Shape Padding: <span>${this._shapePadding}</span></label>
+        <div>
+          <nv-slider id="shapePaddingSlider" min="0" max="100" step="1" value="10" @input="${this._onSettingsChange}"></nv-slider>
         </div>
       </div>
       <div style="margin-top: 8px;">
@@ -230,21 +238,9 @@ export class CanvasApp extends Component {
 
     const { graph, pathPointer } = route(connection, this._rectangles, {
       avoidOtherShapes: this._avoidCollisions,
-      enclosurePadding: this._enclosurePadding * 2,
-      shapePadding: this._enclosurePadding
+      enclosurePadding: this._enclosurePadding,
+      shapePadding: this._shapePadding
     });
-
-    if (this._drawGraph) {
-      ctx.save();
-      ctx.strokeStyle = 'rgba(200, 200, 200, 1)';
-      ctx.lineWidth = 1;
-      for (const edge of graph.edges) {
-        ctx.beginPath();
-        ctx.moveTo(edge.from.x, edge.from.y);
-        ctx.lineTo(edge.to.x, edge.to.y);
-        ctx.stroke();
-      }
-    }
 
     // draw rectangles
     ctx.save();
@@ -272,6 +268,28 @@ export class CanvasApp extends Component {
       }
       ctx.stroke();
     }
+
+    if (this._drawGraph) {
+      ctx.save();
+      ctx.strokeStyle = 'rgba(200, 200, 200, 1)';
+      ctx.lineWidth = 1;
+      for (const edge of graph.edges) {
+        ctx.beginPath();
+        ctx.moveTo(edge.from.x, edge.from.y);
+        ctx.lineTo(edge.to.x, edge.to.y);
+        ctx.stroke();
+      }
+      ctx.restore();
+
+      ctx.save();
+      ctx.fillStyle = 'rgba(0, 0, 0, 1)';
+      for (const node of graph.nodes) {
+        ctx.beginPath();
+        ctx.arc(node.point.x, node.point.y, 5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.restore();
+    }
   }
 
   private _onSettingsChange() {
@@ -280,6 +298,7 @@ export class CanvasApp extends Component {
     this._from = this.connectionFrom.value as Direction;
     this._to = this.connectionTo.value as Direction;
     this._enclosurePadding = (this.paddingSlider as any)._currentValue;
+    this._shapePadding = (this.shapePaddingSlider as any)._currentValue;
     this._startOffset = (this.startOffsetSlider as any)._currentValue;
     this._endOffset = (this.endOffsetSlider as any)._currentValue;
     this._draw();
