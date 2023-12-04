@@ -95,6 +95,7 @@ export class CanvasApp extends Component {
             <option value="W">Right</option>
             <option value="N">Bottom</option>
             <option value="S">Top</option>
+            <option value="*">Any</option>
           </nv-select>
           <span>⇒</span>
           <nv-select id="connectionTo" value="E" label="To">
@@ -102,6 +103,7 @@ export class CanvasApp extends Component {
             <option value="W">Right</option>
             <option value="N">Bottom</option>
             <option value="S">Top</option>
+            <option value="*">Any</option>
           </nv-select>
         </div>
       </div>
@@ -241,15 +243,6 @@ export class CanvasApp extends Component {
       shapePadding: this._shapePadding
     });
 
-    // draw rectangles
-    ctx.save();
-    for (let i = this._rectangles.length - 1; i >= 0; i--) {
-      const rect = this._rectangles[i];
-      ctx.fillStyle = rect.color || '#000';
-      ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
-    }
-    ctx.restore();
-
     // Draw connection
     let current = pathPointer;
     if (current) {
@@ -267,6 +260,17 @@ export class CanvasApp extends Component {
       }
       ctx.stroke();
     }
+
+    // draw rectangles
+    ctx.save();
+    for (let i = this._rectangles.length - 1; i >= 0; i--) {
+      const rect = this._rectangles[i];
+      ctx.fillStyle = rect.color || '#000';
+      ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
+    }
+    ctx.restore();
+
+
 
     if (this._drawGraph) {
       ctx.save();

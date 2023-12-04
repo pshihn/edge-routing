@@ -9,7 +9,7 @@ export interface Line {
   to: NodePoint;
 }
 
-export type Direction = 'N' | 'S' | 'E' | 'W';
+export type Direction = 'N' | 'S' | 'E' | 'W' | '*';
 
 export interface NodeVector {
   length: number;

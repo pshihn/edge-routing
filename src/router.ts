@@ -16,9 +16,10 @@ function computeRulers(rectangles: Rectangle[], connection: Connection): Rulers 
   }
   [connection.from, connection.to].forEach((port) => {
     const position = Math.max(0, Math.min(1, port.position));
-    if (port.direction === 'E' || port.direction === 'W') {
+    if (port.direction === 'E' || port.direction === 'W' || port.direction === '*') {
       horizontals.add(port.rectangle.y + (position * port.rectangle.height));
-    } else {
+    }
+    if (port.direction === 'N' || port.direction === 'S' || port.direction === '*') {
       verticals.add(port.rectangle.x + (position * port.rectangle.width));
     }
   });
@@ -48,6 +49,7 @@ function computeRulers(rectangles: Rectangle[], connection: Connection): Rulers 
 
 function computeNodePoints(rulers: Rulers, rectangles: Rectangle[], connection: Connection, enclosure: Rectangle) {
   const nodes: NodePoint[] = [];
+  const ignoredNodes = new Map<Rectangle, NodePoint[]>();
   const set = new Set<string>();
   const addNode = (p: NodePoint) => {
     const key = `${p.x},${p.y}`;
@@ -67,6 +69,10 @@ function computeNodePoints(rulers: Rulers, rectangles: Rectangle[], connection: 
       const p: NodePoint = { x: v, y: h };
       const contained = rectangles.find((d) => d.contains(p));
       if (contained) {
+        if (!ignoredNodes.has(contained)) {
+          ignoredNodes.set(contained, []);
+        }
+        ignoredNodes.get(contained)!.push(p);
         continue;
       }
       addNode(p);
@@ -102,6 +108,14 @@ function computeNodePoints(rulers: Rulers, rectangles: Rectangle[], connection: 
       } else {
         end = point;
       }
+
+      if ((port.direction === '*') && ignoredNodes.has(rect)) {
+        for (const p of ignoredNodes.get(rect)!) {
+          if (p.x === point.x || p.y === point.y) {
+            addNode(p);
+          }
+        }
+      }
     }
   });
 
@@ -127,6 +141,9 @@ function getPortPoint(rect: Rectangle, port: ConnectionPort) {
       break;
     case 'N':
       point = { x: rect.x + (position * rect.width), y: rect.y2 };
+      break;
+    case '*':
+      point = { x: rect.x + (position * rect.width), y: rect.y + (position * rect.height) };
       break;
   }
   return point;
